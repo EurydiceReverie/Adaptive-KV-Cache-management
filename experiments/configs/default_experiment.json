@@ -1,0 +1,47 @@
+{
+  "_comment": "Default experiment config — KV-Cache Compression Research",
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "dtype": "float16",
+  "device_map": "auto",
+
+  "policies": {
+    "recency_window":      { "keep_last": 512 },
+    "attention_retention": { "keep_last": 512, "keep_top": 128 },
+    "hybrid_cluster":      { "keep_last": 512, "keep_top": 128, "clusters": 64 },
+    "layerwise_hybrid":    { "keep_last": 512, "keep_top": 128 },
+    "sink_token":          { "sink_tokens": 4,  "keep_last": 512 },
+    "heavy_hitter":        { "h2o_budget": 512, "sink_tokens": 4, "h2o_decay": 0.9 },
+    "quantized_int8":      { "keep_last": 0 },
+    "scissorhands":        { "sink_tokens": 4,  "keep_top": 128, "keep_last": 256 },
+    "learned_memory":      { "n_memory": 32, "optim_steps": 50, "lr": 0.01, "always_keep_last": 64 }
+  },
+
+  "benchmark": {
+    "needle": "alpha-7319",
+    "haystack_repeats": 256,
+    "num_seeds": 3
+  },
+
+  "scheduler": {
+    "type": "linear",
+    "start_len": 512,
+    "end_len": 4096,
+    "start_ratio": 0.9,
+    "end_ratio": 0.25
+  },
+
+  "streaming": {
+    "compress_every": 64,
+    "warmup_tokens": 128,
+    "max_new_tokens": 100,
+    "temperature": 0.7,
+    "top_p": 0.9
+  },
+
+  "output": {
+    "results_dir": "experiments/results",
+    "plots_dir": "experiments/results/plots",
+    "export_csv": true,
+    "export_json": true
+  }
+}
